@@ -17,7 +17,9 @@ func Format(line map[string]interface{}) string {
 	for i, k := range keys {
 		val := fmt.Sprintf("%+v", line[k])
 
-		if strings.IndexFunc(k, unicode.IsSpace) >= 0 {
+		if strings.IndexFunc(k, unicode.IsSpace) >= 0 ||
+			strings.IndexRune(k, '"') >= 0 {
+
 			k = fmt.Sprintf("%q", k)
 		}
 
