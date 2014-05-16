@@ -5,25 +5,22 @@ import (
 	"time"
 )
 
-// Root is the root logger, which logs to stdout by default. Instead of directly
-// using the Root logger, we suggest forking and using your own child router
-// using Bind().
-var Root Logger
+var root logger
 
 func init() {
 	// TODO: This is pretty gross. Let's DRY this up
-	root := &logger{defaultTarget: stdout, context: context}
+	root = logger{
+		defaultTarget: stdout,
+		context: map[string]interface{}{
+			"$t": Now,
+		},
+	}
 	root.lcache = &levelCache{
 		iCache: make(map[uintptr]Level),
-		logger: root,
+		logger: &root,
 		rules:  rules{},
 	}
 	root.tcache = &targetCache{defaultTarget: stdout}
-	Root = root
-}
-
-var context = map[string]interface{}{
-	"$t": Now,
 }
 
 var Now fmt.Stringer = now{}
@@ -51,28 +48,28 @@ func (l Level) String() string {
 	}
 }
 
-// Bind returns a new "child" Logger that additionally binds the given context
-// variables.
+// Bind returns a new Logger forked from the global root logger that
+// additionally binds the given context variables.
 func Bind(context map[string]interface{}) Logger {
-	return Root.Bind(context)
+	return root.Bind(context)
 }
 
 // Set the log level for a given selector on the root logger. See the
 // documentation for Logger.SetLevel for the syntax accepted for the selector.
 func SetLevel(selector string, level Level) {
-	Root.SetLevel(selector, level)
+	root.SetLevel(selector, level)
 }
 
 // LogTo logs pre-formatted log lines at the given levels to a channel. If you
 // do not pass any levels, the channel will be used as the default logger for
 // levels not otherwise configured.
 func LogTo(target chan<- string, levels ...Level) {
-	Root.LogTo(target, levels...)
+	root.LogTo(target, levels...)
 }
 
 // SlogTo logs raw log lines at the given levels to a channel. If you do not
 // pass any levels, the channel will be used as the default logger for levels
 // not otherwise configured.
 func SlogTo(target chan<- map[string]interface{}, levels ...Level) {
-	Root.SlogTo(target, levels...)
+	root.SlogTo(target, levels...)
 }
