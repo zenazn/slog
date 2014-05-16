@@ -13,9 +13,8 @@ const (
 	LError
 )
 
-// Type Line is a convenience type for use in constructing objects for Loggers.
-// It is not actually used by the Logger API.
-type Line map[string]interface{}
+// Type Data is a convenience type for use in constructing objects for Loggers.
+type Data map[string]interface{}
 
 /*
 Type Logger is the interface provided by slog's structured logger. It includes
