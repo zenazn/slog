@@ -28,6 +28,8 @@ func (n now) String() string {
 
 var DefaultLevel = LInfo
 
+// String implements the fmt.Stringer interface by returning one of DEBUG, INFO,
+// WARN, or ERROR.
 func (l Level) String() string {
 	switch l {
 	case LDebug:
@@ -39,6 +41,8 @@ func (l Level) String() string {
 	case LError:
 		return "ERROR"
 	default:
+		// Unclear how this would happen, but it's probably not nice to
+		// panic().
 		return fmt.Sprintf("Level(%d)", l)
 	}
 }
@@ -49,7 +53,7 @@ func Bind(context map[string]interface{}) Logger {
 	return root.Bind(context)
 }
 
-// Set the log level for a given selector on the root logger. See the
+// SetLevel sets the log level for a given selector on the root logger. See the
 // documentation for Logger.SetLevel for the syntax accepted for the selector.
 func SetLevel(selector string, level Level) {
 	root.SetLevel(selector, level)
