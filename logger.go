@@ -94,16 +94,20 @@ func (l *logger) genTCache(pcache *targetCache) *targetCache {
 		return pcache
 	}
 
-	targets := make(map[Level]func(map[string]interface{}),
-		len(pcache.targets)+len(l.targets))
-	for k, v := range pcache.targets {
-		targets[k] = v
+	targets := make(map[Level]func(map[string]interface{}))
+	if pcache != nil {
+		for k, v := range pcache.targets {
+			targets[k] = v
+		}
 	}
 	for k, v := range l.targets {
 		targets[k] = v
 	}
 
-	defaultTarget := pcache.defaultTarget
+	var defaultTarget func(map[string]interface{})
+	if pcache != nil {
+		defaultTarget = pcache.defaultTarget
+	}
 	if defaultTarget == nil {
 		defaultTarget = l.defaultTarget
 	}
