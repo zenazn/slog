@@ -46,13 +46,18 @@ func (l *logger) getLCache() *levelCache {
 		// compared to how fast we can chew through our stack.
 		return l.getLCache()
 	}
+
+	return l.genLCache(pcache)
+}
+
+// The caller must hold l's mutex.
+func (l *logger) genLCache(pcache *levelCache) *levelCache {
 	if len(l.context) == 0 {
 		l.atomicSetLCache(pcache)
 		return pcache
 	}
-
 	lc := &levelCache{
-		iCache: make(map[uintptr]Level, len(cache.iCache)),
+		iCache: make(map[uintptr]Level),
 		parent: pcache,
 		logger: l,
 		rules:  l.generateRules(pcache),
@@ -78,8 +83,15 @@ func (l *logger) getTCache() *targetCache {
 	if cache != l.atomicGetTCache() {
 		return l.getTCache()
 	}
+
+	return l.genTCache(pcache)
+}
+
+// The caller must hold l's mutex.
+func (l *logger) genTCache(pcache *targetCache) *targetCache {
 	if len(l.targets) == 0 && l.defaultTarget == nil {
 		l.atomicSetTCache(pcache)
+		return pcache
 	}
 
 	targets := make(map[Level]func(map[string]interface{}),
@@ -181,30 +193,29 @@ func (l *logger) SetLevel(selector string, level Level) {
 	l.Lock()
 	defer l.Unlock()
 	if l.rules == nil {
-		l.rules = make(map[string]Level)
+		l.rules = map[string]Level{selector: level}
+	} else {
+		l.rules[selector] = level
 	}
-	l.rules[selector] = level
 
 	var pcache *levelCache
 	if l.parent != nil {
 		pcache = l.parent.getLCache()
 	}
-	lc := &levelCache{
-		iCache: make(map[uintptr]Level),
-		parent: pcache,
-		logger: l,
-		rules:  l.generateRules(pcache),
-	}
-	l.atomicSetLCache(lc)
+	l.genLCache(pcache)
 }
 
 func (l *logger) LogTo(ch chan<- string, levels ...Level) {
+	l.Lock()
+	defer l.Unlock()
 	l.setTarget(func(line map[string]interface{}) {
 		ch <- Format(line)
 	}, levels)
 }
 
 func (l *logger) SlogTo(ch chan<- map[string]interface{}, levels ...Level) {
+	l.Lock()
+	defer l.Unlock()
 	l.setTarget(func(line map[string]interface{}) {
 		ch <- line
 	}, levels)
@@ -217,4 +228,10 @@ func (l *logger) setTarget(fn func(map[string]interface{}), levels []Level) {
 	for _, level := range levels {
 		l.targets[level] = fn
 	}
+
+	var pcache *targetCache
+	if l.parent != nil {
+		pcache = l.parent.getTCache()
+	}
+	l.genTCache(pcache)
 }

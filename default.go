@@ -8,19 +8,14 @@ import (
 var root logger
 
 func init() {
-	// TODO: This is pretty gross. Let's DRY this up
 	root = logger{
 		defaultTarget: stdout,
 		context: map[string]interface{}{
 			"$t": Now,
 		},
 	}
-	root.lcache = &levelCache{
-		iCache: make(map[uintptr]Level),
-		logger: &root,
-		rules:  rules{},
-	}
-	root.tcache = &targetCache{defaultTarget: stdout}
+	root.genLCache(nil)
+	root.genTCache(nil)
 }
 
 var Now fmt.Stringer = now{}
