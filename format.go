@@ -9,7 +9,8 @@ import (
 )
 
 func needsQuote(r rune) bool {
-	return r == ' ' || r == '"' || r == '\\' || !unicode.IsPrint(r)
+	return r == ' ' || r == '"' || r == '\\' || r == '=' ||
+		!unicode.IsPrint(r)
 }
 
 func Format(line map[string]interface{}) string {

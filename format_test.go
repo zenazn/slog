@@ -2,6 +2,10 @@ package slog
 
 import "testing"
 
+type foo struct {
+	a, b int
+}
+
 var formatTests = []struct {
 	line map[string]interface{}
 	out  string
@@ -17,6 +21,10 @@ var formatTests = []struct {
 	{
 		map[string]interface{}{`"`: `"`},
 		`"\""="\""`,
+	},
+	{
+		map[string]interface{}{`\=`: foo{1, 5}},
+		`"\\="="{a:1 b:5}"`,
 	},
 	{
 		map[string]interface{}{" hello ": "世界"},
