@@ -13,15 +13,19 @@ func needsQuote(r rune) bool {
 		!unicode.IsPrint(r)
 }
 
-func Format(line map[string]interface{}) string {
-	keys := make([]string, 0, len(line))
-	for k := range line {
+// Format formats a generic map into string form. It sorts all key-value pairs
+// by increasing key, and prints strings of the form "key1=value1 key2=value2"
+// etc. The values are first formatted using package fmt's "%+v" encoding, then
+// quoted using double quotes. The keys are quoted if they'd be ambiguous.
+func Format(data map[string]interface{}) string {
+	keys := make([]string, 0, len(data))
+	for k := range data {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
 
 	for i, k := range keys {
-		val := fmt.Sprintf("%+v", line[k])
+		val := fmt.Sprintf("%+v", data[k])
 
 		if strings.IndexFunc(k, needsQuote) >= 0 {
 			k = strconv.Quote(k)
