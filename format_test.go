@@ -23,8 +23,12 @@ var formatTests = []struct {
 		`"\""="\""`,
 	},
 	{
-		map[string]interface{}{`\=`: foo{1, 5}},
-		`"\\="="{a:1 b:5}"`,
+		map[string]interface{}{`=`: foo{1, 5}},
+		`"="="{a:1 b:5}"`,
+	},
+	{
+		map[string]interface{}{`\`: &foo{2, 3}},
+		`"\\"="&{a:2 b:3}"`,
 	},
 	{
 		map[string]interface{}{" hello ": "世界"},
