@@ -24,14 +24,15 @@ func (lc *levelCache) shouldLogAt(level Level) bool {
 	}
 
 	lc.RLock()
-	if l, ok := lc.iCache[pc]; ok {
-		lc.RUnlock()
-		return l <= level
-	}
+	l, ok := lc.iCache[pc]
 	lc.RUnlock()
 
+	if ok {
+		return l <= level
+	}
+
 	f := runtime.FuncForPC(pc)
-	l := lc.levelForFunc(f.Name())
+	l = lc.levelForFunc(f.Name())
 
 	lc.Lock()
 	lc.iCache[pc] = l
