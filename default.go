@@ -11,14 +11,12 @@ func init() {
 	root = logger{
 		defaultTarget: stdout,
 		context: map[string]interface{}{
-			"$t": Now,
+			"$time": now{},
 		},
 	}
 	root.genLCache(nil)
 	root.genTCache(nil)
 }
-
-var Now fmt.Stringer = now{}
 
 type now struct{}
 
