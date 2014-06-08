@@ -13,11 +13,11 @@ const (
 	LError
 )
 
-// Type Data is a convenience type for use in constructing objects for Loggers.
+// Data is a convenience type for use in constructing objects for Loggers.
 type Data map[string]interface{}
 
 /*
-Type Logger is the interface provided by slog's structured logger. It includes
+Logger is the interface provided by slog's structured logger. It includes
 facilities for logging at several levels, the ability to create "child" loggers
 that inherit the settings of their parent, and the ability to dynamically alter
 log verbosity on a per-package and per-function basis at runtime.
