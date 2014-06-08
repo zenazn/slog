@@ -6,7 +6,7 @@ import (
 )
 
 type logger struct {
-	sync.Mutex
+	sync.RWMutex
 	parent        *logger
 	context       map[string]interface{}
 	rules         map[string]Level
@@ -176,8 +176,8 @@ func (l *logger) Error(lines ...map[string]interface{}) bool {
 }
 
 func (l *logger) Bind(context map[string]interface{}) Logger {
-	l.Lock()
-	defer l.Unlock()
+	l.RLock()
+	defer l.RUnlock()
 	ctx := make(map[string]interface{}, len(context)+len(l.context))
 	for k, v := range l.context {
 		ctx[k] = v
