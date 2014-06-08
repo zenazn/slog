@@ -30,7 +30,9 @@ func stdout(line map[string]interface{}) {
 func stdoutWriter(ch <-chan string) {
 	for line := range ch {
 		_, err := os.Stdout.WriteString(line)
-		// Using slog to log errors about slog seems... unwise.
+		// Using slog to log errors about slog seems... unwise, although
+		// it's unclear the stdlib log package will be able to do any
+		// better than us.
 		if err == io.ErrShortWrite {
 			log.Printf("slog: short write of %q", line)
 		} else if err != nil {

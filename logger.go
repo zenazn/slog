@@ -66,6 +66,7 @@ func (l *logger) genLCache(pcache *levelCache) *levelCache {
 	return lc
 }
 
+// This is exactly the same mechanism as getLCache but for a different struct.
 func (l *logger) getTCache() *targetCache {
 	if l.parent == nil {
 		return l.atomicGetTCache()
