@@ -6,7 +6,7 @@ import (
 )
 
 type logger struct {
-	sync.RWMutex
+	lock          sync.RWMutex
 	parent        *logger
 	context       map[string]interface{}
 	rules         map[string]Level
@@ -38,8 +38,8 @@ func (l *logger) getLCache() *levelCache {
 		return cache
 	}
 
-	l.Lock()
-	defer l.Unlock()
+	l.lock.Lock()
+	defer l.lock.Unlock()
 	if cache != l.atomicGetLCache() {
 		// This means we raced with someone else on cache invalidation,
 		// and is fine so long as the cache is invalidated infrequently
@@ -79,8 +79,8 @@ func (l *logger) getTCache() *targetCache {
 		return cache
 	}
 
-	l.Lock()
-	defer l.Unlock()
+	l.lock.Lock()
+	defer l.lock.Unlock()
 	if cache != l.atomicGetTCache() {
 		return l.getTCache()
 	}
@@ -177,8 +177,8 @@ func (l *logger) Error(lines ...map[string]interface{}) bool {
 }
 
 func (l *logger) Bind(context map[string]interface{}) Logger {
-	l.RLock()
-	defer l.RUnlock()
+	l.lock.RLock()
+	defer l.lock.RUnlock()
 	ctx := make(map[string]interface{}, len(context)+len(l.context))
 	for k, v := range l.context {
 		ctx[k] = v
@@ -195,8 +195,8 @@ func (l *logger) Bind(context map[string]interface{}) Logger {
 }
 
 func (l *logger) SetLevel(selector string, level Level) {
-	l.Lock()
-	defer l.Unlock()
+	l.lock.Lock()
+	defer l.lock.Unlock()
 	if l.rules == nil {
 		l.rules = map[string]Level{selector: level}
 	} else {
@@ -211,16 +211,16 @@ func (l *logger) SetLevel(selector string, level Level) {
 }
 
 func (l *logger) LogTo(ch chan<- string, levels ...Level) {
-	l.Lock()
-	defer l.Unlock()
+	l.lock.Lock()
+	defer l.lock.Unlock()
 	l.setTarget(func(line map[string]interface{}) {
 		ch <- Format(line)
 	}, levels)
 }
 
 func (l *logger) SlogTo(ch chan<- map[string]interface{}, levels ...Level) {
-	l.Lock()
-	defer l.Unlock()
+	l.lock.Lock()
+	defer l.lock.Unlock()
 	l.setTarget(func(line map[string]interface{}) {
 		ch <- line
 	}, levels)
