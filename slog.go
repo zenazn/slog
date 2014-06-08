@@ -7,7 +7,7 @@ package slog
 type Level int
 
 const (
-	LDebug Level = 10 + 10*iota
+	LDebug Level = 1 + iota
 	LInfo
 	LWarn
 	LError
