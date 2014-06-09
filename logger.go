@@ -150,7 +150,7 @@ func (l *logger) log(level Level, lines ...map[string]interface{}) bool {
 
 	for _, line := range lines {
 		m := make(map[string]interface{}, len(line)+len(l.context)+1)
-		m["$l"] = level
+		m["$level"] = level
 		for k, v := range l.context {
 			m[k] = v
 		}
