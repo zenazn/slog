@@ -53,7 +53,9 @@ func (l Level) String() string {
 }
 
 // Bind returns a new Logger forked from the global root logger that
-// additionally binds the given context variables.
+// additionally binds the given context variables. It is the only way to create
+// new Loggers, therefore all Loggers, regardless of where they are created have
+// a single common root.
 func Bind(context map[string]interface{}) Logger {
 	return root.Bind(context)
 }
