@@ -24,7 +24,7 @@ type currentTime struct{}
 func (_ currentTime) String() string {
 	// TODO(carl): Just hardcode this. It'll be faster and we can even make
 	// it fixed-width.
-	return time.Now().Format(time.RFC3339Nano)
+	return time.Now().UTC().Format(time.RFC3339Nano)
 }
 
 func init() {
