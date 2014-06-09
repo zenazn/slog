@@ -7,21 +7,28 @@ import (
 
 var root logger
 
-func init() {
-	root = logger{
+func makeRoot(now fmt.Stringer) logger {
+	root := logger{
 		defaultTarget: stdout,
 		context: map[string]interface{}{
-			"$time": now{},
+			"$time": now,
 		},
 	}
 	root.genLCache(nil)
 	root.genTCache(nil)
+	return root
 }
 
-type now struct{}
+type currentTime struct{}
 
-func (n now) String() string {
+func (_ currentTime) String() string {
+	// TODO(carl): Just hardcode this. It'll be faster and we can even make
+	// it fixed-width.
 	return time.Now().Format(time.RFC3339Nano)
+}
+
+func init() {
+	root = makeRoot(currentTime{})
 }
 
 var DefaultLevel = LInfo
