@@ -230,6 +230,9 @@ func (l *logger) setTarget(fn func(map[string]interface{}), levels []Level) {
 	if len(levels) == 0 {
 		l.defaultTarget = fn
 	}
+	if l.targets == nil {
+		l.targets = make(map[Level]func(map[string]interface{}))
+	}
 	for _, level := range levels {
 		l.targets[level] = fn
 	}
