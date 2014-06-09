@@ -27,7 +27,7 @@ func Format(data map[string]interface{}) string {
 	for i, k := range keys {
 		val := fmt.Sprintf("%+v", data[k])
 
-		if strings.IndexFunc(k, needsQuote) >= 0 {
+		if strings.IndexFunc(k, needsQuote) >= 0 || k == "" {
 			k = strconv.Quote(k)
 		}
 

@@ -34,6 +34,10 @@ var formatTests = []struct {
 		map[string]interface{}{" hello ": "世界"},
 		`" hello "="世界"`,
 	},
+	{
+		map[string]interface{}{"": "hi"},
+		`""="hi"`,
+	},
 }
 
 func TestFormat(t *testing.T) {
